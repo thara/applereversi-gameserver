@@ -8,9 +8,9 @@ gen/helloworld:
 		protoc -I helloworld/ helloworld/helloworld.proto --go_out=plugins=grpc:helloworld
 
 .PHONY: runserver
-runserver:  ## Build server
-	@go run ./cmd/server/main.go
+helloworld/server:  ## Build helloworld server
+	@go run ./cmd/helloworld-server/main.go
 
 .PHONY: runclient
-runclient:  ## Build client
-	@go run ./cmd/client/main.go
+helloworld/client:  ## Build helloworld client
+	@go run ./cmd/helloworld-client/main.go Tomochika
