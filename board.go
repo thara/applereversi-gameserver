@@ -42,6 +42,11 @@ type Board struct {
 	cells [boardSize][boardSize]CellState
 }
 
+type BoardCellChanged struct {
+	row int
+	column int
+}
+
 func NewBoard() *Board {
 	b := Board{}
 	b.cells = [boardSize][boardSize]CellState{}
@@ -67,7 +72,8 @@ func (b *Board) CloneBoard() *Board {
 	return &b2
 }
 
-func (b *Board) MakeMove(move *BoardMove) {
+func (b *Board) MakeMove(move *BoardMove) []*BoardCellChanged {
+	changes := make([]*BoardCellChanged, 0)
 	for i := range allLines {
 		v := allLines[i]
 		for j := range allLines {
@@ -82,11 +88,14 @@ func (b *Board) MakeMove(move *BoardMove) {
 				x := int(h)
 				for i := 0; i < n; i++ {
 					b.cells[move.row+i*y][move.column+i*x] = move.color
+					changes = append(changes, &BoardCellChanged{row: move.row+i*y, column: move.column+i*x})
 				}
 			}
 		}
 	}
 	b.cells[move.row][move.column] = move.color
+
+	return changes
 }
 
 func (b *Board) CountCells(c CellState) int {
@@ -128,4 +137,8 @@ func (b *Board) getValidMoves(c CellState) []BoardMove {
 		}
 	}
 	return moves
+}
+
+func (b *Board) CanPlace(m *BoardMove) bool {
+	return m.CanPlace(&b.cells)
 }

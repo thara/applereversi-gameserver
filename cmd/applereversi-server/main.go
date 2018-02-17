@@ -24,6 +24,6 @@ func main() {
 
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
-	pb.RegisterReversiAIServer(grpcServer, pb.NewServer())
+	pb.RegisterReversiServer(grpcServer, pb.NewServer())
 	grpcServer.Serve(lis)
 }

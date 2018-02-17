@@ -9,8 +9,11 @@ It is generated from these files:
 
 It has these top-level messages:
 	GameConfig
+	Game
+	GameJoined
 	Move
-	Empty
+	CellChangeSet
+	CellChanged
 */
 package applereversi
 
@@ -34,29 +37,29 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type GameConfig_Color int32
+type Color int32
 
 const (
-	GameConfig_BLACK GameConfig_Color = 0
-	GameConfig_WHITE GameConfig_Color = 1
+	Color_BLACK Color = 0
+	Color_WHITE Color = 1
 )
 
-var GameConfig_Color_name = map[int32]string{
+var Color_name = map[int32]string{
 	0: "BLACK",
 	1: "WHITE",
 }
-var GameConfig_Color_value = map[string]int32{
+var Color_value = map[string]int32{
 	"BLACK": 0,
 	"WHITE": 1,
 }
 
-func (x GameConfig_Color) String() string {
-	return proto.EnumName(GameConfig_Color_name, int32(x))
+func (x Color) String() string {
+	return proto.EnumName(Color_name, int32(x))
 }
-func (GameConfig_Color) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 0} }
+func (Color) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 type GameConfig struct {
-	Color GameConfig_Color `protobuf:"varint,1,opt,name=color,enum=applereversi.GameConfig_Color" json:"color,omitempty"`
+	Color Color `protobuf:"varint,1,opt,name=color,enum=applereversi.Color" json:"color,omitempty"`
 }
 
 func (m *GameConfig) Reset()                    { *m = GameConfig{} }
@@ -64,22 +67,86 @@ func (m *GameConfig) String() string            { return proto.CompactTextString
 func (*GameConfig) ProtoMessage()               {}
 func (*GameConfig) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *GameConfig) GetColor() GameConfig_Color {
+func (m *GameConfig) GetColor() Color {
 	if m != nil {
 		return m.Color
 	}
-	return GameConfig_BLACK
+	return Color_BLACK
+}
+
+type Game struct {
+	GameId int64 `protobuf:"varint,1,opt,name=gameId" json:"gameId,omitempty"`
+}
+
+func (m *Game) Reset()                    { *m = Game{} }
+func (m *Game) String() string            { return proto.CompactTextString(m) }
+func (*Game) ProtoMessage()               {}
+func (*Game) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+
+func (m *Game) GetGameId() int64 {
+	if m != nil {
+		return m.GameId
+	}
+	return 0
+}
+
+type GameJoined struct {
+	GameId   int64 `protobuf:"varint,1,opt,name=gameId" json:"gameId,omitempty"`
+	PlayerId int64 `protobuf:"varint,2,opt,name=playerId" json:"playerId,omitempty"`
+	Color    Color `protobuf:"varint,3,opt,name=color,enum=applereversi.Color" json:"color,omitempty"`
+}
+
+func (m *GameJoined) Reset()                    { *m = GameJoined{} }
+func (m *GameJoined) String() string            { return proto.CompactTextString(m) }
+func (*GameJoined) ProtoMessage()               {}
+func (*GameJoined) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+
+func (m *GameJoined) GetGameId() int64 {
+	if m != nil {
+		return m.GameId
+	}
+	return 0
+}
+
+func (m *GameJoined) GetPlayerId() int64 {
+	if m != nil {
+		return m.PlayerId
+	}
+	return 0
+}
+
+func (m *GameJoined) GetColor() Color {
+	if m != nil {
+		return m.Color
+	}
+	return Color_BLACK
 }
 
 type Move struct {
-	Row    int32 `protobuf:"varint,1,opt,name=row" json:"row,omitempty"`
-	Column int32 `protobuf:"varint,2,opt,name=column" json:"column,omitempty"`
+	GameId   int64 `protobuf:"varint,1,opt,name=gameId" json:"gameId,omitempty"`
+	PlayerId int64 `protobuf:"varint,2,opt,name=playerId" json:"playerId,omitempty"`
+	Row      int32 `protobuf:"varint,3,opt,name=row" json:"row,omitempty"`
+	Column   int32 `protobuf:"varint,4,opt,name=column" json:"column,omitempty"`
 }
 
 func (m *Move) Reset()                    { *m = Move{} }
 func (m *Move) String() string            { return proto.CompactTextString(m) }
 func (*Move) ProtoMessage()               {}
-func (*Move) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*Move) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *Move) GetGameId() int64 {
+	if m != nil {
+		return m.GameId
+	}
+	return 0
+}
+
+func (m *Move) GetPlayerId() int64 {
+	if m != nil {
+		return m.PlayerId
+	}
+	return 0
+}
 
 func (m *Move) GetRow() int32 {
 	if m != nil {
@@ -95,19 +162,70 @@ func (m *Move) GetColumn() int32 {
 	return 0
 }
 
-type Empty struct {
+type CellChangeSet struct {
+	Move         *Move          `protobuf:"bytes,1,opt,name=move" json:"move,omitempty"`
+	Cells        []*CellChanged `protobuf:"bytes,2,rep,name=cells" json:"cells,omitempty"`
+	GameFinished bool           `protobuf:"varint,3,opt,name=gameFinished" json:"gameFinished,omitempty"`
 }
 
-func (m *Empty) Reset()                    { *m = Empty{} }
-func (m *Empty) String() string            { return proto.CompactTextString(m) }
-func (*Empty) ProtoMessage()               {}
-func (*Empty) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (m *CellChangeSet) Reset()                    { *m = CellChangeSet{} }
+func (m *CellChangeSet) String() string            { return proto.CompactTextString(m) }
+func (*CellChangeSet) ProtoMessage()               {}
+func (*CellChangeSet) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *CellChangeSet) GetMove() *Move {
+	if m != nil {
+		return m.Move
+	}
+	return nil
+}
+
+func (m *CellChangeSet) GetCells() []*CellChanged {
+	if m != nil {
+		return m.Cells
+	}
+	return nil
+}
+
+func (m *CellChangeSet) GetGameFinished() bool {
+	if m != nil {
+		return m.GameFinished
+	}
+	return false
+}
+
+type CellChanged struct {
+	Row    int32 `protobuf:"varint,2,opt,name=row" json:"row,omitempty"`
+	Column int32 `protobuf:"varint,3,opt,name=column" json:"column,omitempty"`
+}
+
+func (m *CellChanged) Reset()                    { *m = CellChanged{} }
+func (m *CellChanged) String() string            { return proto.CompactTextString(m) }
+func (*CellChanged) ProtoMessage()               {}
+func (*CellChanged) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
+func (m *CellChanged) GetRow() int32 {
+	if m != nil {
+		return m.Row
+	}
+	return 0
+}
+
+func (m *CellChanged) GetColumn() int32 {
+	if m != nil {
+		return m.Column
+	}
+	return 0
+}
 
 func init() {
 	proto.RegisterType((*GameConfig)(nil), "applereversi.GameConfig")
+	proto.RegisterType((*Game)(nil), "applereversi.Game")
+	proto.RegisterType((*GameJoined)(nil), "applereversi.GameJoined")
 	proto.RegisterType((*Move)(nil), "applereversi.Move")
-	proto.RegisterType((*Empty)(nil), "applereversi.Empty")
-	proto.RegisterEnum("applereversi.GameConfig_Color", GameConfig_Color_name, GameConfig_Color_value)
+	proto.RegisterType((*CellChangeSet)(nil), "applereversi.CellChangeSet")
+	proto.RegisterType((*CellChanged)(nil), "applereversi.CellChanged")
+	proto.RegisterEnum("applereversi.Color", Color_name, Color_value)
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -118,109 +236,138 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for ReversiAI service
+// Client API for Reversi service
 
-type ReversiAIClient interface {
-	Init(ctx context.Context, in *GameConfig, opts ...grpc.CallOption) (*Empty, error)
-	SelectMove(ctx context.Context, opts ...grpc.CallOption) (ReversiAI_SelectMoveClient, error)
+type ReversiClient interface {
+	CreateGame(ctx context.Context, in *GameConfig, opts ...grpc.CallOption) (*GameJoined, error)
+	JoinGame(ctx context.Context, in *Game, opts ...grpc.CallOption) (*GameJoined, error)
+	SelectMove(ctx context.Context, opts ...grpc.CallOption) (Reversi_SelectMoveClient, error)
 }
 
-type reversiAIClient struct {
+type reversiClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewReversiAIClient(cc *grpc.ClientConn) ReversiAIClient {
-	return &reversiAIClient{cc}
+func NewReversiClient(cc *grpc.ClientConn) ReversiClient {
+	return &reversiClient{cc}
 }
 
-func (c *reversiAIClient) Init(ctx context.Context, in *GameConfig, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := grpc.Invoke(ctx, "/applereversi.ReversiAI/Init", in, out, c.cc, opts...)
+func (c *reversiClient) CreateGame(ctx context.Context, in *GameConfig, opts ...grpc.CallOption) (*GameJoined, error) {
+	out := new(GameJoined)
+	err := grpc.Invoke(ctx, "/applereversi.Reversi/CreateGame", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *reversiAIClient) SelectMove(ctx context.Context, opts ...grpc.CallOption) (ReversiAI_SelectMoveClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_ReversiAI_serviceDesc.Streams[0], c.cc, "/applereversi.ReversiAI/SelectMove", opts...)
+func (c *reversiClient) JoinGame(ctx context.Context, in *Game, opts ...grpc.CallOption) (*GameJoined, error) {
+	out := new(GameJoined)
+	err := grpc.Invoke(ctx, "/applereversi.Reversi/JoinGame", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &reversiAISelectMoveClient{stream}
+	return out, nil
+}
+
+func (c *reversiClient) SelectMove(ctx context.Context, opts ...grpc.CallOption) (Reversi_SelectMoveClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_Reversi_serviceDesc.Streams[0], c.cc, "/applereversi.Reversi/SelectMove", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &reversiSelectMoveClient{stream}
 	return x, nil
 }
 
-type ReversiAI_SelectMoveClient interface {
+type Reversi_SelectMoveClient interface {
 	Send(*Move) error
-	Recv() (*Move, error)
+	Recv() (*CellChangeSet, error)
 	grpc.ClientStream
 }
 
-type reversiAISelectMoveClient struct {
+type reversiSelectMoveClient struct {
 	grpc.ClientStream
 }
 
-func (x *reversiAISelectMoveClient) Send(m *Move) error {
+func (x *reversiSelectMoveClient) Send(m *Move) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *reversiAISelectMoveClient) Recv() (*Move, error) {
-	m := new(Move)
+func (x *reversiSelectMoveClient) Recv() (*CellChangeSet, error) {
+	m := new(CellChangeSet)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-// Server API for ReversiAI service
+// Server API for Reversi service
 
-type ReversiAIServer interface {
-	Init(context.Context, *GameConfig) (*Empty, error)
-	SelectMove(ReversiAI_SelectMoveServer) error
+type ReversiServer interface {
+	CreateGame(context.Context, *GameConfig) (*GameJoined, error)
+	JoinGame(context.Context, *Game) (*GameJoined, error)
+	SelectMove(Reversi_SelectMoveServer) error
 }
 
-func RegisterReversiAIServer(s *grpc.Server, srv ReversiAIServer) {
-	s.RegisterService(&_ReversiAI_serviceDesc, srv)
+func RegisterReversiServer(s *grpc.Server, srv ReversiServer) {
+	s.RegisterService(&_Reversi_serviceDesc, srv)
 }
 
-func _ReversiAI_Init_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Reversi_CreateGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GameConfig)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReversiAIServer).Init(ctx, in)
+		return srv.(ReversiServer).CreateGame(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/applereversi.ReversiAI/Init",
+		FullMethod: "/applereversi.Reversi/CreateGame",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReversiAIServer).Init(ctx, req.(*GameConfig))
+		return srv.(ReversiServer).CreateGame(ctx, req.(*GameConfig))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ReversiAI_SelectMove_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ReversiAIServer).SelectMove(&reversiAISelectMoveServer{stream})
+func _Reversi_JoinGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Game)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReversiServer).JoinGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/applereversi.Reversi/JoinGame",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReversiServer).JoinGame(ctx, req.(*Game))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
-type ReversiAI_SelectMoveServer interface {
-	Send(*Move) error
+func _Reversi_SelectMove_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ReversiServer).SelectMove(&reversiSelectMoveServer{stream})
+}
+
+type Reversi_SelectMoveServer interface {
+	Send(*CellChangeSet) error
 	Recv() (*Move, error)
 	grpc.ServerStream
 }
 
-type reversiAISelectMoveServer struct {
+type reversiSelectMoveServer struct {
 	grpc.ServerStream
 }
 
-func (x *reversiAISelectMoveServer) Send(m *Move) error {
+func (x *reversiSelectMoveServer) Send(m *CellChangeSet) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *reversiAISelectMoveServer) Recv() (*Move, error) {
+func (x *reversiSelectMoveServer) Recv() (*Move, error) {
 	m := new(Move)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -228,19 +375,23 @@ func (x *reversiAISelectMoveServer) Recv() (*Move, error) {
 	return m, nil
 }
 
-var _ReversiAI_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "applereversi.ReversiAI",
-	HandlerType: (*ReversiAIServer)(nil),
+var _Reversi_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "applereversi.Reversi",
+	HandlerType: (*ReversiServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Init",
-			Handler:    _ReversiAI_Init_Handler,
+			MethodName: "CreateGame",
+			Handler:    _Reversi_CreateGame_Handler,
+		},
+		{
+			MethodName: "JoinGame",
+			Handler:    _Reversi_JoinGame_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "SelectMove",
-			Handler:       _ReversiAI_SelectMove_Handler,
+			Handler:       _Reversi_SelectMove_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
@@ -251,20 +402,29 @@ var _ReversiAI_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("apple_reversi.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 228 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4e, 0x2c, 0x28, 0xc8,
-	0x49, 0x8d, 0x2f, 0x4a, 0x2d, 0x4b, 0x2d, 0x2a, 0xce, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17,
-	0xe2, 0x01, 0x0b, 0x42, 0xc5, 0x94, 0x12, 0xb9, 0xb8, 0xdc, 0x13, 0x73, 0x53, 0x9d, 0xf3, 0xf3,
-	0xd2, 0x32, 0xd3, 0x85, 0x4c, 0xb8, 0x58, 0x93, 0xf3, 0x73, 0xf2, 0x8b, 0x24, 0x18, 0x15, 0x18,
-	0x35, 0xf8, 0x8c, 0xe4, 0xf4, 0x90, 0xd5, 0xea, 0x21, 0x14, 0xea, 0x39, 0x83, 0x54, 0x05, 0x41,
-	0x14, 0x2b, 0xc9, 0x72, 0xb1, 0x82, 0xf9, 0x42, 0x9c, 0x5c, 0xac, 0x4e, 0x3e, 0x8e, 0xce, 0xde,
-	0x02, 0x0c, 0x20, 0x66, 0xb8, 0x87, 0x67, 0x88, 0xab, 0x00, 0xa3, 0x92, 0x01, 0x17, 0x8b, 0x6f,
-	0x7e, 0x59, 0xaa, 0x90, 0x00, 0x17, 0x73, 0x51, 0x7e, 0x39, 0xd8, 0x68, 0xd6, 0x20, 0x10, 0x53,
-	0x48, 0x8c, 0x8b, 0x2d, 0x39, 0x3f, 0xa7, 0x34, 0x37, 0x4f, 0x82, 0x09, 0x2c, 0x08, 0xe5, 0x29,
-	0xb1, 0x73, 0xb1, 0xba, 0xe6, 0x16, 0x94, 0x54, 0x1a, 0x35, 0x30, 0x72, 0x71, 0x06, 0x41, 0x6c,
-	0x77, 0xf4, 0x14, 0x32, 0xe7, 0x62, 0xf1, 0xcc, 0xcb, 0x2c, 0x11, 0x92, 0xc0, 0xe5, 0x2c, 0x29,
-	0x61, 0x54, 0x19, 0xb0, 0x21, 0x4a, 0x0c, 0x42, 0x56, 0x5c, 0x5c, 0xc1, 0xa9, 0x39, 0xa9, 0xc9,
-	0x25, 0x60, 0x77, 0x08, 0xa1, 0x2a, 0x02, 0x89, 0x49, 0x61, 0x11, 0x53, 0x62, 0xd0, 0x60, 0x34,
-	0x60, 0x4c, 0x62, 0x03, 0x87, 0x9a, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x73, 0xdf, 0xd9, 0xd6,
-	0x4c, 0x01, 0x00, 0x00,
+	// 375 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x52, 0x4d, 0x4f, 0xf2, 0x40,
+	0x10, 0xa6, 0xb4, 0xe5, 0xe5, 0x1d, 0xd0, 0x90, 0x25, 0x31, 0x15, 0xa3, 0x21, 0x7b, 0x30, 0xe8,
+	0x01, 0x4d, 0x3d, 0x90, 0x78, 0x93, 0xc6, 0x0f, 0xfc, 0xb8, 0x2c, 0x26, 0x1e, 0x4d, 0x6d, 0x47,
+	0x68, 0xdc, 0x76, 0x9b, 0xa5, 0x62, 0xfc, 0x0f, 0xfe, 0x36, 0x7f, 0x93, 0xd9, 0x2d, 0xf2, 0xa1,
+	0xa0, 0x89, 0xb7, 0xf9, 0x78, 0x66, 0xe6, 0x79, 0x66, 0x06, 0xea, 0x7e, 0x9a, 0x72, 0xbc, 0x97,
+	0x38, 0x46, 0x39, 0x8a, 0xda, 0xa9, 0x14, 0x99, 0x20, 0x55, 0x1d, 0x9c, 0xc4, 0x68, 0x07, 0xe0,
+	0xdc, 0x8f, 0xd1, 0x13, 0xc9, 0x63, 0x34, 0x20, 0x7b, 0x60, 0x07, 0x82, 0x0b, 0xe9, 0x18, 0x4d,
+	0xa3, 0xb5, 0xee, 0xd6, 0xdb, 0xf3, 0xd8, 0xb6, 0xa7, 0x52, 0x2c, 0x47, 0xd0, 0x1d, 0xb0, 0x54,
+	0x21, 0xd9, 0x80, 0xd2, 0xc0, 0x8f, 0xb1, 0x17, 0xea, 0x1a, 0x93, 0x4d, 0x3c, 0xfa, 0x94, 0x37,
+	0xbe, 0x14, 0x51, 0x82, 0xe1, 0x2a, 0x14, 0x69, 0x40, 0x39, 0xe5, 0xfe, 0x2b, 0xca, 0x5e, 0xe8,
+	0x14, 0x75, 0x66, 0xea, 0xcf, 0xc8, 0x98, 0xbf, 0x92, 0x09, 0xc1, 0xba, 0x11, 0x63, 0xfc, 0xd3,
+	0x98, 0x1a, 0x98, 0x52, 0xbc, 0xe8, 0x21, 0x36, 0x53, 0xa6, 0xea, 0x12, 0x08, 0xfe, 0x1c, 0x27,
+	0x8e, 0xa5, 0x83, 0x13, 0x8f, 0xbe, 0x19, 0xb0, 0xe6, 0x21, 0xe7, 0xde, 0xd0, 0x4f, 0x06, 0xd8,
+	0xc7, 0x8c, 0xec, 0x82, 0x15, 0x8b, 0x31, 0xea, 0x69, 0x15, 0x97, 0x2c, 0x32, 0x54, 0x8c, 0x98,
+	0xce, 0x93, 0x03, 0xb0, 0x03, 0xe4, 0x7c, 0xe4, 0x14, 0x9b, 0x66, 0xab, 0xe2, 0x6e, 0x7e, 0x91,
+	0x32, 0xed, 0x19, 0xb2, 0x1c, 0x47, 0x28, 0x54, 0x15, 0xf5, 0xb3, 0x28, 0x89, 0x46, 0x43, 0x0c,
+	0x35, 0xbb, 0x32, 0x5b, 0x88, 0xd1, 0x0e, 0x54, 0xe6, 0x2a, 0x3f, 0x75, 0x14, 0x97, 0xe9, 0x30,
+	0xe7, 0x75, 0xec, 0x6f, 0x83, 0xad, 0xb7, 0x47, 0xfe, 0x83, 0xdd, 0xbd, 0x3e, 0xf1, 0xae, 0x6a,
+	0x05, 0x65, 0xde, 0x5d, 0xf4, 0x6e, 0x4f, 0x6b, 0x86, 0xfb, 0x6e, 0xc0, 0x3f, 0x96, 0x53, 0x23,
+	0x5d, 0x00, 0x4f, 0xa2, 0x9f, 0xa1, 0xbe, 0xb5, 0xb3, 0xc8, 0x7b, 0xf6, 0x38, 0x8d, 0x25, 0x99,
+	0xfc, 0xf2, 0xb4, 0x40, 0x8e, 0xa1, 0xac, 0x6c, 0xdd, 0x81, 0x7c, 0xc7, 0xfd, 0x58, 0xeb, 0x01,
+	0xf4, 0x91, 0x63, 0x90, 0xe9, 0xf3, 0x2e, 0x59, 0x70, 0x63, 0x6b, 0xd5, 0x2e, 0xfb, 0x98, 0xd1,
+	0x42, 0xcb, 0x38, 0x34, 0x1e, 0x4a, 0xfa, 0xf1, 0x8f, 0x3e, 0x02, 0x00, 0x00, 0xff, 0xff, 0xf0,
+	0xcd, 0xb9, 0x53, 0x0f, 0x03, 0x00, 0x00,
 }

@@ -2,24 +2,45 @@ syntax = "proto3";
 
 package applereversi;
 
-service ReversiAI {
-    rpc Init(GameConfig) returns (Empty) {}
-    rpc SelectMove(stream Move) returns (stream Move) {}
+service Reversi {
+    rpc CreateGame(GameConfig) returns (GameJoined) {}
+    rpc JoinGame(Game) returns (GameJoined) {}
+    rpc SelectMove(stream Move) returns (stream CellChangeSet) {}
+}
+
+enum Color {
+    BLACK = 0;
+    WHITE = 1;
 }
 
 message GameConfig {
-    enum Color {
-        BLACK = 0;
-        WHITE = 1;
-    }
     Color color = 1;
 }
 
-message Move {
-    int32 row = 1;
-    int32 column = 2;
+message Game {
+    int64 gameId = 1;
 }
 
-message Empty {
+message GameJoined {
+    int64 gameId = 1;
+    int64 playerId = 2;
+    Color color = 3;
+}
 
+message Move {
+    int64 gameId = 1;
+    int64 playerId = 2;
+    int32 row = 3;
+    int32 column = 4;
+}
+
+message CellChangeSet {
+    Move move = 1;
+    repeated CellChanged cells = 2;
+    bool gameFinished = 3;
+}
+
+message CellChanged {
+    int32 row = 2;
+    int32 column = 3;
 }
