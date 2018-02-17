@@ -17,7 +17,7 @@ import (
 )
 
 type AppleReversiServer struct {
-	mu sync.Mutex
+	mu       sync.Mutex
 	cpuColor GameConfig_Color
 }
 

@@ -1,12 +1,13 @@
 package applereversi
 
-import ("math")
+import (
+	"math"
+)
 
 const (
 	minScore = math.MinInt64
 	maxScore = math.MaxInt64
 )
-
 
 type Search interface {
 	GetBestScore(board *Board, color CellState) int
@@ -15,7 +16,7 @@ type Search interface {
 type EvaluationFunc func(*Board, CellState) int
 
 type SearchAlgorithm struct {
-	eval EvaluationFunc
+	eval     EvaluationFunc
 	maxDepth int
 }
 
@@ -32,25 +33,25 @@ func (m *MiniMaxMethod) minMax(node *Board, color CellState, depth int) int {
 		return m.eval(node, color)
 	}
 	moves := node.getValidMoves(color)
-	if depth % 2 == 0 {
+	if depth%2 == 0 {
 		// opponent turn
 		worstScore := maxScore
 		for i := range moves {
 			mv := moves[i]
 			test := node.CloneBoard()
 			test.MakeMove(&mv)
-			score := m.minMax(test, OppnentColor(color), depth + 1)
+			score := m.minMax(test, OppnentColor(color), depth+1)
 			worstScore = min(worstScore, score)
 		}
 		return worstScore
 	} else {
 		// self turn
 		bestScore := minScore
-		for i := range moves{
+		for i := range moves {
 			mv := moves[i]
 			test := node.CloneBoard()
 			test.MakeMove(&mv)
-			score := m.minMax(test, OppnentColor(color), depth + 1)
+			score := m.minMax(test, OppnentColor(color), depth+1)
 			bestScore = max(bestScore, score)
 		}
 		return bestScore

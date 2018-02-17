@@ -1,8 +1,8 @@
 package applereversi
 
 type BoardMove struct {
-	color CellState
-	row int
+	color  CellState
+	row    int
 	column int
 }
 
@@ -12,10 +12,10 @@ func (m *BoardMove) CountFlippableDisks(direction Direction, cells *[boardSize][
 	opponent := OppnentColor(m.color)
 	count := 1
 
-	for (m.row + count * y) < boardSize && (m.column + count * x) < boardSize && cells[m.row + count * y][m.column + count * x] == opponent {
+	for (m.row+count*y) < boardSize && (m.column+count*x) < boardSize && cells[m.row+count*y][m.column+count*x] == opponent {
 		count++
 	}
-	if cells[m.row + count * y][m.column + count * x] == m.color {
+	if cells[m.row+count*y][m.column+count*x] == m.color {
 		return count - 1
 	} else {
 		return 0

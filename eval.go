@@ -1,6 +1,5 @@
 package applereversi
 
-
 var cellWeights = [][]int{
 	{120, -20, 20, 5, 5, 20, -20, 120},
 	{-20, -40, -5, -5, -5, -5, -40, -20},
@@ -12,7 +11,6 @@ var cellWeights = [][]int{
 	{120, -20, 20, 5, 5, 20, -20, 120},
 }
 
-
 func GetWeightedScore(board *Board, color CellState) int {
 	opponent := OppnentColor(color)
 
@@ -21,9 +19,9 @@ func GetWeightedScore(board *Board, color CellState) int {
 		for j := 0; j < boardSize; j++ {
 			s := board.cells[i][j]
 			if s == color {
-				total +=cellWeights[i][j]
+				total += cellWeights[i][j]
 			} else if s == opponent {
-				total -=cellWeights[i][j]
+				total -= cellWeights[i][j]
 			}
 
 		}

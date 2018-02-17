@@ -34,7 +34,7 @@ const (
 var allLines = [3]Line{lineBackward, lineHold, lineForward}
 
 type Direction struct {
-	vertical Line
+	vertical   Line
 	horizontal Line
 }
 
@@ -81,7 +81,7 @@ func (b *Board) MakeMove(move *BoardMove) {
 				y := int(v)
 				x := int(h)
 				for i := 0; i < n; i++ {
-					b.cells[move.row + i * y][move.column + i * x] = move.color
+					b.cells[move.row+i*y][move.column+i*x] = move.color
 				}
 			}
 		}
