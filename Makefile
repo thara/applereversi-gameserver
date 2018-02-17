@@ -6,4 +6,4 @@ prepare:
 
 
 gen/helloworld:
-		go generate github.com/thara/applereversi-gameserver
+		protoc -I helloworld/ helloworld.proto --go_out=plugins=grpc:helloworld
