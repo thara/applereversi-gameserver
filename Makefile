@@ -9,6 +9,14 @@ prepare:
 applereversi/gen:
 		protoc -I . apple_reversi.proto --go_out=plugins=grpc:.
 
+.PHONY: applereversi/server
+applereversi/server:
+	@go run ./cmd/applereversi-server/main.go
+
+.PHONY: applereversi/client
+applereversi/client:
+	@go run ./cmd/applereversi-client/main.go
+
 
 .PHONY: helloworld/gen
 helloworld/gen:
