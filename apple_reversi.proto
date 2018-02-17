@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package applereversi;
+
+service Reversi {
+    rpc CreateGame(GameConfig) returns (GameJoined) {}
+    rpc JoinGame(Game) returns (GameJoined) {}
+    rpc SelectMove(stream Move) returns (stream Move) {}
+}
+
+enum Color {
+    BLACK = 0;
+    WHITE = 1;
+}
+
+message GameConfig {
+    Color color = 1;
+}
+
+message Game {
+    int64 gameId = 1;
+}
+
+message GameJoined {
+    int64 gameId = 1;
+    int64 playerId = 2;
+    Color color = 3;
+}
+
+message Move {
+    int32 row = 3;
+    int32 column = 4;
+}
