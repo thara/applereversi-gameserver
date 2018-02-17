@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package applereversi;
+
+service ReversiAI {
+    rpc Init(GameConfig) returns (Empty) {}
+    rpc SelectMove(stream Move) returns (stream Move) {}
+}
+
+message GameConfig {
+    enum Color {
+        BLACK = 0;
+        WHITE = 1;
+    }
+    Color color = 1;
+}
+
+message Move {
+    int32 row = 1;
+    int32 column = 2;
+}
+
+message Empty {
+
+}

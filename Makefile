@@ -4,6 +4,12 @@ prepare:
 		brew install protobuf
 		go get -u github.com/golang/protobuf/protoc-gen-go
 
+
+.PHONY: applereversi/gen
+applereversi/gen:
+		protoc -I . apple_reversi.proto --go_out=plugins=grpc:.
+
+
 .PHONY: helloworld/gen
 helloworld/gen:
 		protoc -I helloworld/ helloworld/helloworld.proto --go_out=plugins=grpc:helloworld
