@@ -35,7 +35,8 @@ type Room struct {
 	members map[CellState]int64
 	host    int64
 	guest   int64
-	changes map[CellState]chan CellChangeSet
+	ch chan Move
+	mu       sync.Mutex
 }
 
 func (s *AppleReversiServer) CreateGame(ctx context.Context, config *GameConfig) (*GameJoined, error) {
@@ -81,9 +82,15 @@ func (s *AppleReversiServer) SelectMove(stream Reversi_SelectMoveServer) error {
 	}
 
 	go func(){
-		c := <- room.changes[state]
-		if err := stream.Send(&c); err != nil {
-			log.Print("Send failed")
+		for {
+			select {
+			case mv := <-room.ch:
+				if err := stream.Send(&mv); err != nil {
+					log.Print("Send failed")
+				}
+			case <-stream.Context().Done():
+				log.Print("Consumer end")
+			}
 		}
 	}()
 
@@ -95,34 +102,11 @@ func (s *AppleReversiServer) SelectMove(stream Reversi_SelectMoveServer) error {
 		if err != nil {
 			return err
 		}
-
 		log.Printf("Player move : %s", move)
 
-		mv := &BoardMove{
-			color: state,
-			row: int(move.Row),
-			column: int(move.Column),
-		}
-
-		if room.board.CanPlace(mv) {
-			s.mu.Lock()
-			result := room.board.MakeMove(mv)
-			s.mu.Unlock()
-
-			changes := make([]*CellChanged, 0)
-			for i := range result {
-				c := result[i]
-				changes = append(changes, &CellChanged{Row: int32(c.row), Column: int32(c.column)})
-			}
-			res := CellChangeSet{Move: move, Cells: changes, GameFinished: room.board.HasGameFinished()}
-
-			for k := range room.changes {
-				room.changes[k] <- res
-			}
-			//if err := stream.Send(res); err != nil {
-			//	return err
-			//}
-		}
+		s.mu.Lock()
+		room.ch <- *move
+		s.mu.Unlock()
 	}
 }
 
