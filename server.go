@@ -76,10 +76,6 @@ func (s *AppleReversiServer) SelectMove(stream Reversi_SelectMoveServer) error {
 	if !ok {
 		return errors.New("game id does not exists")
 	}
-	state, ok := room.states[int64(playerId)]
-	if !ok {
-		return errors.New("player id does not exists")
-	}
 
 	go func(){
 		for {
@@ -146,6 +142,7 @@ func toCellState(c Color) CellState {
 	case Color_WHITE:
 		return cellStateWhite
 	}
+	return cellStateEmpty
 }
 
 func toColor(state CellState) Color {
@@ -155,4 +152,5 @@ func toColor(state CellState) Color {
 	case cellStateWhite:
 		return Color_WHITE
 	}
+	return Color_BLACK
 }
