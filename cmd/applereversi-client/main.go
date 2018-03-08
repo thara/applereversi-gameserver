@@ -12,11 +12,15 @@ import (
 
 	"google.golang.org/grpc"
 	pb "github.com/thara/applereversi-gameserver"
+	"google.golang.org/grpc/metadata"
 )
 
 var (
 	serverAddr         = flag.String("server_addr", "127.0.0.1:10000", "The server address in the format of host:port")
 	serverHostOverride = flag.String("server_host_override", "example.com", "The server name use to verify the hostname returned by TLS handshake")
+
+	guest = flag.Bool("guest", false, "")
+	gameId = flag.Int64("gameId", 0, "")
 )
 
 func main() {
@@ -30,12 +34,30 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := pb.NewReversiAIClient(conn)
+	client := pb.NewReversiClient(conn)
 
-	config := pb.GameConfig{Color: pb.GameConfig_BLACK}
-	client.Init(context.Background(), &config)
+	var joined *pb.GameJoined
+	if *guest {
+		log.Print("Guest : JoinGame")
+		game := pb.Game{ GameId: *gameId}
+		joined, err = client.JoinGame(context.Background(), &game)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		log.Print("Host : CreateGame")
+		config := pb.GameConfig{Color: pb.Color_BLACK}
+		joined, err = client.CreateGame(context.Background(), &config)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	log.Printf("playerId: %d, gameId : %d", joined.PlayerId, joined.GameId)
 
-	stream, err := client.SelectMove(context.Background())
+	md := metadata.Pairs("player-id", strconv.FormatInt(joined.PlayerId, 10), "game-id", strconv.FormatInt(joined.GameId, 10))
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
+	stream, err := client.SelectMove(ctx)
 	if err != nil {
 		log.Fatalf("%v.RouteChat(_) = _, %v", client, err)
 	}

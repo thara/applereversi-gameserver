@@ -18,14 +18,13 @@ import (
 	_ "github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 
-	metadata "google.golang.org/grpc/metadata"
-	"strings"
+	"google.golang.org/grpc/metadata"
 	"strconv"
 )
 
 type AppleReversiServer struct {
-	mu       sync.Mutex
-	games	 map[int64]*Room
+	mu    sync.Mutex
+	games map[int64]*Room
 }
 
 type Room struct {
@@ -35,12 +34,22 @@ type Room struct {
 	members map[CellState]int64
 	host    int64
 	guest   int64
-	ch chan Move
-	mu       sync.Mutex
+	ch      map[int64]chan Move
+	mu      sync.Mutex
+}
+
+func (r *Room) opponent(playerId int64) int64 {
+	if r.host == playerId {
+		return r.guest
+	} else {
+		return r.host
+	}
 }
 
 func (s *AppleReversiServer) CreateGame(ctx context.Context, config *GameConfig) (*GameJoined, error) {
 	room := s.newRoom(toCellState(config.Color))
+	room.ch = make(map[int64]chan Move)
+	room.ch[room.host] = make(chan Move)
 	return &GameJoined{GameId: room.gameId, PlayerId: room.host, Color: config.Color}, nil
 }
 
@@ -50,7 +59,7 @@ func (s *AppleReversiServer) JoinGame(ctx context.Context, game *Game) (*GameJoi
 		return nil, errors.New("game id does not exists")
 	}
 	c := room.states[room.guest]
-
+	room.ch[room.guest] = make(chan Move)
 	return &GameJoined{GameId: room.gameId, PlayerId: room.guest, Color: toColor(c)}, nil
 }
 
@@ -59,15 +68,16 @@ func (s *AppleReversiServer) SelectMove(stream Reversi_SelectMoveServer) error {
 	if !ok {
 		return errors.New("Can not get metadata from stream")
 	}
-	if len(md["gameId"]) == 0 && len(md["playerId"]) == 0 {
+	log.Printf("%v", md)
+	if len(md["game-id"]) == 0 && len(md["player-id"]) == 0 {
 		return errors.New("Invalid metadata : required gameId & playerId")
 	}
 
-	gameId, err := strconv.Atoi(md["gameId"][0])
+	gameId, err := strconv.Atoi(md["game-id"][0])
 	if err != nil {
 		return errors.New("Invalid metadata : game id must be numeric")
 	}
-	playerId, err := strconv.Atoi(md["playerId"][0])
+	playerId, err := strconv.ParseInt(md["player-id"][0], 10, 64)
 	if err != nil {
 		return errors.New("Invalid metadata : game id must be numeric")
 	}
@@ -77,15 +87,16 @@ func (s *AppleReversiServer) SelectMove(stream Reversi_SelectMoveServer) error {
 		return errors.New("game id does not exists")
 	}
 
-	go func(){
+	go func() {
 		for {
 			select {
-			case mv := <-room.ch:
+			case mv := <-room.ch[playerId]:
 				if err := stream.Send(&mv); err != nil {
 					log.Print("Send failed")
 				}
 			case <-stream.Context().Done():
 				log.Print("Consumer end")
+				return
 			}
 		}
 	}()
@@ -101,7 +112,7 @@ func (s *AppleReversiServer) SelectMove(stream Reversi_SelectMoveServer) error {
 		log.Printf("Player move : %s", move)
 
 		s.mu.Lock()
-		room.ch <- *move
+		room.ch[room.opponent(playerId)] <- *move
 		s.mu.Unlock()
 	}
 }
